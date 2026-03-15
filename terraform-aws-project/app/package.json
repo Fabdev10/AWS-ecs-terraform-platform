@@ -1,0 +1,12 @@
+{
+  "name": "hello-world-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simple Express application for the ECS Fargate deployment.",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

@@ -1,0 +1,11 @@
+name: Terraform
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scaffold_notice:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain workflow status
+        run: echo "CI/CD workflow implementation is intentionally deferred until the infrastructure modules are completed."
