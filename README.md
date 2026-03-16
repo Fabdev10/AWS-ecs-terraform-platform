@@ -11,39 +11,42 @@ Phase 1 is implemented:
 - dev and prod root modules wired to the VPC module
 - placeholder module directories for ECS, ALB, RDS, and ECR
 - simple Node.js application scaffold for the later ECS phase
+- GitHub Actions workflow for Terraform CI/CD
 
 ## Repository layout
 
 ```text
-terraform-aws-project/
-├── environments/
-│   ├── dev/
-│   │   ├── backend.tf
-│   │   ├── main.tf
-│   │   ├── outputs.tf
-│   │   ├── terraform.tfvars
-│   │   └── variables.tf
-│   └── prod/
-│       ├── backend.tf
-│       ├── main.tf
-│       ├── outputs.tf
-│       ├── terraform.tfvars
-│       └── variables.tf
-├── modules/
-│   ├── alb/
-│   ├── ecr/
-│   ├── ecs/
-│   ├── rds/
-│   └── vpc/
+AWS-ecs-terraform-platform/
 ├── .github/
 │   └── workflows/
-│       └── terraform.yml
-├── app/
-│   ├── .dockerignore
-│   ├── Dockerfile
-│   ├── package.json
-│   └── src/
-│       └── index.js
+│       └── terraform-ci-cd.yml
+├── terraform-aws-project/
+│   ├── environments/
+│   │   ├── dev/
+│   │   │   ├── backend.tf
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   ├── terraform.tfvars
+│   │   │   └── variables.tf
+│   │   └── prod/
+│   │       ├── backend.tf
+│   │       ├── main.tf
+│   │       ├── outputs.tf
+│   │       ├── terraform.tfvars
+│   │       └── variables.tf
+│   ├── modules/
+│   │   ├── alb/
+│   │   ├── ecr/
+│   │   ├── ecs/
+│   │   ├── rds/
+│   │   └── vpc/
+│   ├── app/
+│   │   ├── .dockerignore
+│   │   ├── Dockerfile
+│   │   ├── package.json
+│   │   └── src/
+│   │       └── index.js
+│   └── README.md
 └── README.md
 ```
 
@@ -106,3 +109,51 @@ docker run -p 3000:3000 hello-world-app
 Continue to the ALB module next.
 Explain the VPC design and file layout in more detail.
 Adjust the VPC design first, for example CIDRs, tags, AZ handling, or backend conventions.
+
+## CI/CD with GitHub Actions
+
+This repository now includes a complete Terraform pipeline in `.github/workflows/terraform-ci-cd.yml`.
+
+The workflow includes:
+
+- `terraform fmt -check -recursive`
+- `terraform validate` for `dev` and `prod`
+- Terraform plan for `dev` and `prod`
+- automatic apply to `dev` on push to `main`
+- manual apply to `prod` via `workflow_dispatch`
+
+### Required GitHub secrets
+
+Add these repository secrets before running the pipeline:
+
+- `AWS_ROLE_ARN_DEV` (IAM role to assume in dev via OIDC)
+- `AWS_ROLE_ARN_PROD` (IAM role to assume in prod via OIDC)
+- `TF_STATE_BUCKET` (S3 bucket name used for Terraform state)
+- `TF_LOCK_TABLE` (DynamoDB table name used for Terraform locking)
+
+### Recommended GitHub environment setup
+
+Create two GitHub Environments:
+
+- `development`
+- `production`
+
+For `production`, configure required reviewers to enforce a manual approval gate before `apply`.
+
+### Trigger behavior
+
+- Pull request:
+  - runs format and validation checks
+  - runs plans for both `dev` and `prod`
+- Push to `main`:
+  - runs checks and plan
+  - applies automatically to `dev`
+- Manual run (`workflow_dispatch`):
+  - choose environment (`dev` or `prod`)
+  - choose action (`plan` or `apply`)
+
+### Notes
+
+- All Terraform commands run inside `terraform-aws-project/environments/dev` and `terraform-aws-project/environments/prod`.
+- Backend config is injected at runtime (`bucket`, `key`, `region`, `dynamodb_table`).
+- For pull requests from forks, plan jobs may be skipped or fail if secrets are not available.

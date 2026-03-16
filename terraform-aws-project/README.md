@@ -35,9 +35,6 @@ terraform-aws-project/
 │   ├── ecs/
 │   ├── rds/
 │   └── vpc/
-├── .github/
-│   └── workflows/
-│       └── terraform.yml
 ├── app/
 │   ├── .dockerignore
 │   ├── Dockerfile
@@ -104,3 +101,51 @@ docker run -p 3000:3000 hello-world-app
 ## What comes next
 
 The next infrastructure phase should add the ALB module, because it establishes the entrypoint contract that the ECS service will depend on.
+
+## CI/CD with GitHub Actions
+
+This repository now includes a complete Terraform pipeline in `../.github/workflows/terraform-ci-cd.yml`.
+
+The workflow includes:
+
+- `terraform fmt -check -recursive`
+- `terraform validate` for `dev` and `prod`
+- Terraform plan for `dev` and `prod`
+- automatic apply to `dev` on push to `main`
+- manual apply to `prod` via `workflow_dispatch`
+
+### Required GitHub secrets
+
+Add these repository secrets before running the pipeline:
+
+- `AWS_ROLE_ARN_DEV` (IAM role to assume in dev via OIDC)
+- `AWS_ROLE_ARN_PROD` (IAM role to assume in prod via OIDC)
+- `TF_STATE_BUCKET` (S3 bucket name used for Terraform state)
+- `TF_LOCK_TABLE` (DynamoDB table name used for Terraform locking)
+
+### Recommended GitHub environment setup
+
+Create two GitHub Environments:
+
+- `development`
+- `production`
+
+For `production`, configure required reviewers to enforce a manual approval gate before `apply`.
+
+### Trigger behavior
+
+- Pull request:
+  - runs format and validation checks
+  - runs plans for both `dev` and `prod`
+- Push to `main`:
+  - runs checks and plan
+  - applies automatically to `dev`
+- Manual run (`workflow_dispatch`):
+  - choose environment (`dev` or `prod`)
+  - choose action (`plan` or `apply`)
+
+### Notes
+
+- All Terraform commands run inside `environments/dev` and `environments/prod`.
+- Backend config is injected at runtime (`bucket`, `key`, `region`, `dynamodb_table`).
+- For pull requests from forks, plan jobs may be skipped or fail if secrets are not available.
