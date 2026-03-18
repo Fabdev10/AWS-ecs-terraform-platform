@@ -21,9 +21,9 @@ private_subnet_cidrs = [
 ]
 
 common_tags = {
-  Owner       = "platform-team"
-  CostCenter  = "engineering"
-  Terraform   = "true"
+  Owner      = "platform-team"
+  CostCenter = "engineering"
+  Terraform  = "true"
 }
 
 alb_ingress_cidr_blocks = ["0.0.0.0/0"]
