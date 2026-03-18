@@ -23,8 +23,8 @@ variable "public_subnet_cidrs" {
   type        = list(string)
 
   validation {
-    condition     = length(var.public_subnet_cidrs) == length(var.availability_zones)
-    error_message = "Provide one public subnet CIDR per availability zone."
+    condition     = length(var.public_subnet_cidrs) == 2
+    error_message = "Provide exactly two public subnet CIDR blocks."
   }
 }
 
@@ -33,8 +33,8 @@ variable "private_subnet_cidrs" {
   type        = list(string)
 
   validation {
-    condition     = length(var.private_subnet_cidrs) == length(var.availability_zones)
-    error_message = "Provide one private subnet CIDR per availability zone."
+    condition     = length(var.private_subnet_cidrs) == 2
+    error_message = "Provide exactly two private subnet CIDR blocks."
   }
 }
 
