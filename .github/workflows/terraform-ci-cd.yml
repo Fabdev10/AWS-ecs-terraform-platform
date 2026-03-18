@@ -90,7 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate
     if: |
-      github.event_name == 'pull_request' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false) ||
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
 
@@ -107,11 +107,29 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
+      - name: Check required secrets (dev)
+        env:
+          AWS_ROLE_ARN_DEV: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+          TF_LOCK_TABLE: ${{ secrets.TF_LOCK_TABLE }}
+        run: |
+          missing=()
+          [ -z "$AWS_ROLE_ARN_DEV" ] && missing+=("AWS_ROLE_ARN_DEV")
+          [ -z "$TF_STATE_BUCKET" ] && missing+=("TF_STATE_BUCKET")
+          [ -z "$TF_LOCK_TABLE" ] && missing+=("TF_LOCK_TABLE")
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error title=Missing GitHub secrets::Missing required secrets: ${missing[*]}"
+            exit 1
+          fi
+
       - name: Configure AWS credentials (dev)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
           aws-region: ${{ env.AWS_REGION }}
+          role-session-name: terraform-plan-dev
+          mask-aws-account-id: true
 
       - name: Terraform init
         run: |
@@ -136,7 +154,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate
     if: |
-      github.event_name == 'pull_request' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false) ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'prod')
 
     defaults:
@@ -152,11 +170,29 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
+      - name: Check required secrets (prod)
+        env:
+          AWS_ROLE_ARN_PROD: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+          TF_LOCK_TABLE: ${{ secrets.TF_LOCK_TABLE }}
+        run: |
+          missing=()
+          [ -z "$AWS_ROLE_ARN_PROD" ] && missing+=("AWS_ROLE_ARN_PROD")
+          [ -z "$TF_STATE_BUCKET" ] && missing+=("TF_STATE_BUCKET")
+          [ -z "$TF_LOCK_TABLE" ] && missing+=("TF_LOCK_TABLE")
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error title=Missing GitHub secrets::Missing required secrets: ${missing[*]}"
+            exit 1
+          fi
+
       - name: Configure AWS credentials (prod)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
           aws-region: ${{ env.AWS_REGION }}
+          role-session-name: terraform-plan-prod
+          mask-aws-account-id: true
 
       - name: Terraform init
         run: |
@@ -201,11 +237,29 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
+      - name: Check required secrets (dev)
+        env:
+          AWS_ROLE_ARN_DEV: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+          TF_LOCK_TABLE: ${{ secrets.TF_LOCK_TABLE }}
+        run: |
+          missing=()
+          [ -z "$AWS_ROLE_ARN_DEV" ] && missing+=("AWS_ROLE_ARN_DEV")
+          [ -z "$TF_STATE_BUCKET" ] && missing+=("TF_STATE_BUCKET")
+          [ -z "$TF_LOCK_TABLE" ] && missing+=("TF_LOCK_TABLE")
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error title=Missing GitHub secrets::Missing required secrets: ${missing[*]}"
+            exit 1
+          fi
+
       - name: Configure AWS credentials (dev)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
           aws-region: ${{ env.AWS_REGION }}
+          role-session-name: terraform-apply-dev
+          mask-aws-account-id: true
 
       - name: Terraform init
         run: |
@@ -250,11 +304,29 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
+      - name: Check required secrets (prod)
+        env:
+          AWS_ROLE_ARN_PROD: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+          TF_LOCK_TABLE: ${{ secrets.TF_LOCK_TABLE }}
+        run: |
+          missing=()
+          [ -z "$AWS_ROLE_ARN_PROD" ] && missing+=("AWS_ROLE_ARN_PROD")
+          [ -z "$TF_STATE_BUCKET" ] && missing+=("TF_STATE_BUCKET")
+          [ -z "$TF_LOCK_TABLE" ] && missing+=("TF_LOCK_TABLE")
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error title=Missing GitHub secrets::Missing required secrets: ${missing[*]}"
+            exit 1
+          fi
+
       - name: Configure AWS credentials (prod)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
           aws-region: ${{ env.AWS_REGION }}
+          role-session-name: terraform-apply-prod
+          mask-aws-account-id: true
 
       - name: Terraform init
         run: |
