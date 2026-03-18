@@ -1,7 +1,7 @@
 aws_region = "eu-west-1"
 
 project_name = "aws-ecs-platform"
-environment  = "dev"
+environment = "dev"
 
 vpc_cidr = "10.10.0.0/16"
 
@@ -25,3 +25,10 @@ common_tags = {
   CostCenter  = "engineering"
   Terraform   = "true"
 }
+
+alb_ingress_cidr_blocks = ["0.0.0.0/0"]
+alb_listener_port = 80
+app_port          = 3000
+health_check_path = "/health"
+
+alb_enable_deletion_protection = false

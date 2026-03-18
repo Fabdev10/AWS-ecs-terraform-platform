@@ -38,3 +38,28 @@ variable "common_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "alb_ingress_cidr_blocks" {
+  description = "CIDR blocks allowed to reach the dev ALB."
+  type        = list(string)
+}
+
+variable "alb_listener_port" {
+  description = "Listener port exposed by the dev ALB."
+  type        = number
+}
+
+variable "app_port" {
+  description = "Port exposed by the application behind the dev ALB."
+  type        = number
+}
+
+variable "health_check_path" {
+  description = "Health check path used by the dev ALB target group."
+  type        = string
+}
+
+variable "alb_enable_deletion_protection" {
+  description = "Whether deletion protection is enabled on the dev ALB."
+  type        = bool
+}

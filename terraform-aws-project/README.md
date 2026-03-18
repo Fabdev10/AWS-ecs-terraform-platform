@@ -4,12 +4,14 @@ This repository is structured like a small production platform rather than a sin
 
 ## Current status
 
-Phase 1 is implemented:
+Phase 2 is implemented:
 
 - repository scaffold
 - reusable VPC module
 - dev and prod root modules wired to the VPC module
-- placeholder module directories for ECS, ALB, RDS, and ECR
+- reusable ALB module with HTTP listener and target group
+- dev and prod root modules wired to the ALB module
+- placeholder module directories for ECS, RDS, and ECR
 - simple Node.js application scaffold for the later ECS phase
 
 ## Repository layout
@@ -86,6 +88,8 @@ terraform plan -var-file=terraform.tfvars
 
 Repeat the same flow in environments/prod with a different backend key.
 
+The GitHub Actions workflow uses `terraform init -backend=false` before `terraform validate` so repository validation does not depend on backend credentials or remote state access.
+
 ## Local application usage
 
 The application is a minimal Express service with two endpoints:
@@ -103,4 +107,4 @@ docker run -p 3000:3000 hello-world-app
 
 ## What comes next
 
-The next infrastructure phase should add the ALB module, because it establishes the entrypoint contract that the ECS service will depend on.
+The next infrastructure phase should add the ECR module so the platform has a stable image publishing target before the ECS service is introduced.
