@@ -13,36 +13,42 @@ Phase 2 is implemented:
 - dev and prod root modules wired to the ALB module
 - placeholder module directories for ECS, RDS, and ECR
 - simple Node.js application scaffold for the later ECS phase
+- GitHub Actions workflow for Terraform CI/CD
 
 ## Repository layout
 
 ```text
-terraform-aws-project/
-├── environments/
-│   ├── dev/
-│   │   ├── backend.tf
-│   │   ├── main.tf
-│   │   ├── outputs.tf
-│   │   ├── terraform.tfvars
-│   │   └── variables.tf
-│   └── prod/
-│       ├── backend.tf
-│       ├── main.tf
-│       ├── outputs.tf
-│       ├── terraform.tfvars
-│       └── variables.tf
-├── modules/
-│   ├── alb/
-│   ├── ecr/
-│   ├── ecs/
-│   ├── rds/
-│   └── vpc/
-├── app/
-│   ├── .dockerignore
-│   ├── Dockerfile
-│   ├── package.json
-│   └── src/
-│       └── index.js
+AWS-ecs-terraform-platform/
+├── .github/
+│   └── workflows/
+│       └── terraform-ci-cd.yml
+├── terraform-aws-project/
+│   ├── environments/
+│   │   ├── dev/
+│   │   │   ├── backend.tf
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   ├── terraform.tfvars
+│   │   │   └── variables.tf
+│   │   └── prod/
+│   │       ├── backend.tf
+│   │       ├── main.tf
+│   │       ├── outputs.tf
+│   │       ├── terraform.tfvars
+│   │       └── variables.tf
+│   ├── modules/
+│   │   ├── alb/
+│   │   ├── ecr/
+│   │   ├── ecs/
+│   │   ├── rds/
+│   │   └── vpc/
+│   ├── app/
+│   │   ├── .dockerignore
+│   │   ├── Dockerfile
+│   │   ├── package.json
+│   │   └── src/
+│   │       └── index.js
+│   └── README.md
 └── README.md
 ```
 
@@ -85,7 +91,7 @@ terraform plan -var-file=terraform.tfvars
 
 Repeat the same flow in environments/prod with a different backend key.
 
-The GitHub Actions workflow uses `terraform init -backend=false` before `terraform validate` so repository validation does not depend on backend credentials or remote state access.
+The validation stage in GitHub Actions uses `terraform init -backend=false`, while plan and apply inject backend settings at runtime.
 
 ## Local application usage
 
@@ -108,7 +114,7 @@ The next infrastructure phase should add the ECR module so the platform has a st
 
 ## CI/CD with GitHub Actions
 
-This repository now includes a complete Terraform pipeline in `.github/workflows/terraform-ci-cd.yml` at the repository root.
+This repository now includes a complete Terraform pipeline in `.github/workflows/terraform-ci-cd.yml`.
 
 The workflow includes:
 
