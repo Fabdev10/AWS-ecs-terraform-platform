@@ -49,3 +49,35 @@ module "alb" {
   enable_deletion_protection = var.alb_enable_deletion_protection
   tags                       = merge(local.base_tags, var.common_tags)
 }
+
+module "ecr" {
+  source = "../../modules/ecr"
+
+  name                 = "${var.project_name}-${var.environment}"
+  image_tag_mutability = var.ecr_image_tag_mutability
+  scan_on_push         = var.ecr_scan_on_push
+  max_image_count      = var.ecr_max_image_count
+  tags                 = merge(local.base_tags, var.common_tags)
+}
+
+module "ecs" {
+  source = "../../modules/ecs"
+
+  name                   = "${var.project_name}-${var.environment}"
+  aws_region             = var.aws_region
+  vpc_id                 = module.vpc.vpc_id
+  private_subnet_ids     = module.vpc.private_subnet_ids
+  alb_security_group_id  = module.alb.security_group_id
+  target_group_arn       = module.alb.target_group_arn
+  container_name         = "app"
+  container_image        = "${module.ecr.repository_url}:${var.app_image_tag}"
+  container_port         = var.app_port
+  cpu                    = var.ecs_cpu
+  memory                 = var.ecs_memory
+  desired_count          = var.ecs_desired_count
+  enable_execute_command = var.ecs_enable_execute_command
+  environment_variables  = var.app_environment
+  tags                   = merge(local.base_tags, var.common_tags)
+
+  depends_on = [module.alb]
+}

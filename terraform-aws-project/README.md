@@ -4,14 +4,17 @@ This repository is structured like a small production platform rather than a sin
 
 ## Current status
 
-Phase 2 is implemented:
+Phase 3 is implemented:
 
 - repository scaffold
 - reusable VPC module
 - dev and prod root modules wired to the VPC module
 - reusable ALB module with HTTP listener and target group
 - dev and prod root modules wired to the ALB module
-- placeholder module directories for ECS, RDS, and ECR
+- reusable ECR module with lifecycle and scan-on-push support
+- reusable ECS Fargate module (cluster, task definition, service, IAM, logs)
+- dev and prod root modules wired to ECR and ECS modules
+- placeholder module directory for RDS
 - simple Node.js application scaffold for the later ECS phase
 
 ## Repository layout
@@ -104,7 +107,7 @@ docker run -p 3000:3000 hello-world-app
 
 ## What comes next
 
-The next infrastructure phase should add the ECR module so the platform has a stable image publishing target before the ECS service is introduced.
+The next infrastructure phase can add the RDS module and application-side database configuration so the service can move from stateless demo traffic to persistent workloads.
 
 ## CI/CD with GitHub Actions
 

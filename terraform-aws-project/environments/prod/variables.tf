@@ -63,3 +63,49 @@ variable "alb_enable_deletion_protection" {
   description = "Whether deletion protection is enabled on the prod ALB."
   type        = bool
 }
+
+variable "ecr_image_tag_mutability" {
+  description = "Whether ECR image tags are mutable in prod."
+  type        = string
+}
+
+variable "ecr_scan_on_push" {
+  description = "Whether pushed images are scanned in prod ECR."
+  type        = bool
+}
+
+variable "ecr_max_image_count" {
+  description = "Maximum number of images retained in the prod ECR repository."
+  type        = number
+}
+
+variable "app_image_tag" {
+  description = "Image tag deployed by the ECS service."
+  type        = string
+}
+
+variable "ecs_cpu" {
+  description = "CPU units for the prod ECS task definition."
+  type        = number
+}
+
+variable "ecs_memory" {
+  description = "Memory in MiB for the prod ECS task definition."
+  type        = number
+}
+
+variable "ecs_desired_count" {
+  description = "Desired number of running tasks in the prod ECS service."
+  type        = number
+}
+
+variable "ecs_enable_execute_command" {
+  description = "Whether ECS Exec is enabled in the prod ECS service."
+  type        = bool
+}
+
+variable "app_environment" {
+  description = "Environment variables injected into the prod ECS container."
+  type        = map(string)
+  default     = {}
+}

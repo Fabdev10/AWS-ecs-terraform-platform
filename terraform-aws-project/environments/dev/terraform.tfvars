@@ -32,3 +32,19 @@ app_port                = 3000
 health_check_path       = "/health"
 
 alb_enable_deletion_protection = false
+
+ecr_image_tag_mutability = "MUTABLE"
+ecr_scan_on_push         = true
+ecr_max_image_count      = 20
+
+app_image_tag = "latest"
+
+ecs_cpu                    = 256
+ecs_memory                 = 512
+ecs_desired_count          = 1
+ecs_enable_execute_command = false
+
+app_environment = {
+  NODE_ENV = "development"
+  PORT     = "3000"
+}

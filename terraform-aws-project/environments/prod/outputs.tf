@@ -42,3 +42,28 @@ output "alb_target_group_arn" {
   description = "Target group ARN for the prod application load balancer."
   value       = module.alb.target_group_arn
 }
+
+output "ecr_repository_url" {
+  description = "ECR repository URL for prod image pushes."
+  value       = module.ecr.repository_url
+}
+
+output "ecs_cluster_name" {
+  description = "Name of the prod ECS cluster."
+  value       = module.ecs.cluster_name
+}
+
+output "ecs_service_name" {
+  description = "Name of the prod ECS service."
+  value       = module.ecs.service_name
+}
+
+output "ecs_service_security_group_id" {
+  description = "Security group ID attached to prod ECS tasks."
+  value       = module.ecs.service_security_group_id
+}
+
+output "ecs_log_group_name" {
+  description = "CloudWatch log group used by the prod ECS service."
+  value       = module.ecs.log_group_name
+}
